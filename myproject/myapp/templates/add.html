@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <style>
+        .element {
+            margin-bottom: 10px;
+        }
+
+        .button-group {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .button-group button {
+            width: auto;
+            display: inline-block; /* Prevents buttons from stretching to fit the container */
+        }
+    </style>
+    <title>Мульти-элементный интерфейс добавления данных</title>
+</head>
+<body>
+    <nav class="container-fluid">
+        <ul>
+            <li><strong>Word ГОСТ Редактор</strong></li>
+        </ul>
+        <ul>
+            <li><a href="#">Главная</a></li>
+            <li><a href="#">О приложении</a></li>
+            <li><a href="#">Контакты</a></li>
+        </ul>
+    </nav>
+    <main class="container">
+        <div class="grid">
+            <section>
+                <h2>Добавление множества элементов</h2>
+                <p>Добавляйте различные типы данных, такие как текст, изображения, формулы и таблицы.</p>
+                <form class="grid" id="multiElementForm">
+                    <div id="elementsContainer">
+                        <div class="element">
+                            <label for="elementType0">Тип элемента:</label>
+                            <select id="elementType0" name="elementType0" onchange="adjustElementInput(0)">
+                                <option value="text">Текст</option>
+                                <option value="image">Изображение</option>
+                                <option value="formula">Формула</option>
+                                <option value="table">Таблица</option>
+                                <option value="header">Заголовок</option>
+                            </select>
+                            <div id="elementInput0"></div>
+                        </div>
+                    </div>
+                </form>
+                <div class="button-group">
+                    <button type="button" onclick="addElement()">Добавить еще элемент</button>
+                    <button type="button" onclick="submitElements()">Добавить в документ</button>
+                </div>
+                <button type="button" onclick="downloadDocument()" style="display: block; margin: 20px auto 0;">Скачать документ</button>
+            </section>
+        </div>
+    </main>
+    <footer class="container">
+        <small>
+            <a href="#">Политика конфиденциальности</a> • <a href="#">Условия использования</a>
+        </small>
+    </footer>
+    <script>
+        let elementCount = 1;
+
+        function adjustElementInput(index) {
+            const typeSelect = document.getElementById('elementType' + index);
+            const inputContainer = document.getElementById('elementInput' + index);
+            inputContainer.innerHTML = '';
+            switch (typeSelect.value) {
+                case 'text':
+                    inputContainer.innerHTML = '<label for="text' + index + '">Текст:</label><textarea id="text' + index + '" name="text' + index + '" rows="3"></textarea>';
+                    break;
+                case 'image':
+                    inputContainer.innerHTML = '<label for="image' + index + '">URL изображения:</label><input type="text" id="image' + index + '" name="image' + index + '" placeholder="http://example.com/image.jpg">';
+                    break;
+                case 'formula':
+                    inputContainer.innerHTML = '<label for="formula' + index + '">Формула (в формате LaTeX, например, \\frac{1}{2}):</label><input type="text" id="formula' + index + '" name="formula' + index + '" placeholder="Введите формулу">';
+                    break;
+                case 'table':
+                    inputContainer.innerHTML = '<label for="tableRows' + index + '">Количество строк:</label><input type="number" id="tableRows' + index + '" name="tableRows' + index + '" min="1" value="2"><br><label for="tableCols' + index + '">Количество столбцов:</label><input type="number" id="tableCols' + index + '" name="tableCols' + index + '" min="1" value="2"><br><button type="button" onclick="generateTable(' + index + ')">Создать таблицу</button><div id="tableContainer' + index + '"></div>';
+                    break;
+                case 'header':
+                    inputContainer.innerHTML = '<label for="header' + index + '">Заголовок:</label><input type="text" id="header' + index + '" name="header' + index + '" placeholder="Введите заголовок">';
+                    break;
+            }
+        }
+
+        function generateTable(index) {
+            const rows = document.getElementById('tableRows' + index).value;
+            const cols = document.getElementById('tableCols' + index).value;
+            const tableContainer = document.getElementById('tableContainer' + index);
+            let tableHTML = '<table border="1">';
+            for (let i = 0; i < rows; i++) {
+                tableHTML += '<tr>';
+                for (let j = 0; j < cols; j++) {
+                    tableHTML += '<td>Ячейка ' + (i + 1) + ',' + (j + 1) + '</td>';
+                }
+                tableHTML += '</tr>';
+            }
+            tableHTML += '</table>';
+            tableContainer.innerHTML = tableHTML;
+        }
+
+        function addElement() {
+            const container = document.getElementById('elementsContainer');
+            const newElement = document.createElement('div');
+            newElement.classList.add('element');
+            newElement.innerHTML = '<label for="elementType' + elementCount + '">Тип элемента:</label><select id="elementType' + elementCount + '" name="elementType' + elementCount + '" onchange="adjustElementInput(' + elementCount + ')"><option value="text">Текст</option><option value="image">Изображение</option><option value="formula">Формула</option><option value="table">Таблица</option><option value="header">Заголовок</option></select><div id="elementInput' + elementCount + '"></div>';
+            container.appendChild(newElement);
+            adjustElementInput(elementCount);
+            elementCount++;
+        }
+
+        function submitElements() {
+            alert('Элементы добавлены в документ!');
+        }
+
+        function downloadDocument() {
+    // Создаем переменную для хранения всего текста
+    let allText = "";
+
+    // Проходимся по всем добавленным элементам и собираем их данные
+    for (let i = 0; i < elementCount; i++) {
+        const elementType = document.getElementById('elementType' + i).value;
+        switch (elementType) {
+            case 'text':
+                const textValue = document.getElementById('text' + i).value;
+                allText += "Текст: " + textValue + "\n";
+                break;
+            case 'header':
+                const headerValue = document.getElementById('header' + i).value;
+                allText += "Заголовок: " + headerValue + "\n";
+                break;
+            // Для других типов элементов добавьте соответствующую логику
+        }
+    }
+
+    // Создаем ссылку для скачивания
+    const element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(allText));
+    element.setAttribute('download', "document.txt");
+
+    // Программно кликаем по ссылке для скачивания
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+
+    // Удаляем ссылку после скачивания
+    document.body.removeChild(element);
+}
+
+    </script>
