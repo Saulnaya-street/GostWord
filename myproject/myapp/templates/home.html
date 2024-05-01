@@ -9,12 +9,18 @@
 <body>
     <nav class="container-fluid">
         <ul>
-            <li><strong>Word ГОСТ Редактор</strong></li>
+            <li><strong><a href="{% url 'home' %}">Word ГОСТ Редактор</a></strong></li>
         </ul>
         <ul>
-            <li><a href="#">Главная</a></li>
-            <li><a href="#">О приложении</a></li>
-            <li><a href="#" role="button">Контакты</a></li>
+            <li><a href="{% url 'home' %}">Главная</a></li>
+            <li><a href="{% url 'about' %}">О приложении</a></li>
+            <li><a href="{% url 'contact' %}">Контакты</a></li>
+            {% if user.is_authenticated %}
+                <li><a href="{% url 'profile' %}">Профиль</a></li>
+                <li><a href="{% url 'confirm_logout' %}">Выйти</a></li>
+            {% else %}
+                <li><a href="{% url 'login' %}">Авторизация</a></li>
+            {% endif %}
         </ul>
     </nav>
     <main class="container">
@@ -46,17 +52,18 @@
                     <h2>Начните использовать сейчас</h2>
                     <h3>Быстрая регистрация</h3>
                 </hgroup>
-                <form class="grid">
+                <form class="grid" action="{% url 'register' %}" method="post">
+                    {% csrf_token %}
                     <input type="text" id="firstname" name="firstname" placeholder="Ваше имя" aria-label="Ваше имя" required />
                     <input type="email" id="email" name="email" placeholder="Ваш email" aria-label="Ваш email" required />
-                    <button type="submit" onclick="event.preventDefault()">Регистрация</button>
+                    <button type="submit">Регистрация</button>
                 </form>
             </article>
         </div>
     </section>
     <footer class="container">
         <small>
-            <a href="#">Политика конфиденциальности</a> • <a href="#">Условия использования</a>
+            <a href="{% url 'terms' %}">Условия использования</a> • <a href="{% url 'privacy_policy' %}">Политика конфиденциальности</a>
         </small>
     </footer>
 </body>

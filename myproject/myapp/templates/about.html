@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <title>О приложении - Word ГОСТ Редактор</title>
+</head>
+<body>
+    <nav class="container-fluid">
+        <ul>
+            <li><strong><a href="{% url 'home' %}" style="color: inherit; text-decoration: none;">Word ГОСТ Редактор</a></strong></li>
+        </ul>
+        <ul>
+            <li><a href="{% url 'home' %}">Главная</a></li>
+            <li><a href="{% url 'about' %}">О приложении</a></li>
+            <li><a href="{% url 'contact' %}">Контакты</a></li>
+            {% if user.is_authenticated %}
+                <li><a href="{% url 'profile' %}">Профиль</a></li>
+                <li><a href="{% url 'confirm_logout' %}">Выйти</a></li>
+            {% else %}
+                <li><a href="{% url 'login' %}">Авторизация</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    <main class="container">
+        <div class="grid">
+            <section>
+                <hgroup>
+                    <h2>О приложении</h2>
+                    <h3>Word ГОСТ Редактор</h3>
+                </hgroup>
+                <p>Word ГОСТ Редактор - это веб-приложение, созданное для упрощения процесса внесения информации в документы Word согласно ГОСТ. Мы стремимся сделать этот процесс максимально простым и удобным для всех пользователей.</p>
+                <figure>
+                    <img src="https://source.unsplash.com/random/800x600" alt="Интерфейс приложения" />
+                    <figcaption><a href="https://source.unsplash.com" target="_blank">Источник изображения</a></figcaption>
+                </figure>
+                <h3>Функционал</h3>
+                <p>Приложение позволяет быстро добавлять названия, заголовки, текст и другие элементы в ваш документ, обеспечивая соответствие всем требованиям ГОСТ. Наш интерфейс интуитивно понятен, что позволяет с легкостью вносить необходимые изменения в документ.</p>
+                <h3>Преимущества использования</h3>
+                <p>Используя наше приложение, вы экономите время и избегаете ошибок при форматировании документов по ГОСТ. Мы постоянно работаем над улучшением функционала и расширением возможностей Word ГОСТ Редактора, чтобы вы могли с удобством редактировать ваши документы.</p>
+            </section>
+        </div>
+    </main>
+    <footer class="container">
+        <small>
+            <a href="{% url 'terms' %}">Условия использования</a> • <a href="#">Политика конфиденциальности</a>
+        </small>
+    </footer>
+</body>
+</html>

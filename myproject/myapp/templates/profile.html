@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <style>
+        .profile-container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        }
+        .profile-card {
+            background: #f9f9f9;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .profile-card h2, .profile-card h3 {
+            color: #333;
+        }
+        .profile-card p {
+            margin: 10px 0;
+        }
+        .action-list {
+            list-style: none;
+            padding: 0;
+        }
+        .action-list li {
+            margin-bottom: 10px;
+        }
+        .action-list a {
+            color: #007bff;
+            text-decoration: none;
+            padding: 5px 10px;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+        }
+        .action-list a:hover {
+            background-color: #ddd;
+        }
+    </style>
+    <title>Профиль пользователя</title>
+</head>
+<body>
+   <nav class="container-fluid">
+        <ul>
+            <li><strong><a href="{% url 'home' %}" style="color: inherit; text-decoration: none;">Word ГОСТ Редактор</a></strong></li>
+        </ul>
+        <ul>
+            <li><a href="{% url 'home' %}">Главная</a></li>
+            <li><a href="{% url 'about' %}">О приложении</a></li>
+            <li><a href="{% url 'contact' %}">Контакты</a></li>
+            {% if user.is_authenticated %}
+                <li><a href="{% url 'profile' %}">Профиль</a></li>
+                <li><a href="{% url 'confirm_logout' %}">Выйти</a></li>
+            {% else %}
+                <li><a href="{% url 'login' %}">Авторизация</a></li>
+            {% endif %}
+        </ul>
+   </nav>
+    <main class="profile-container">
+        <div class="profile-card">
+            <h2>Профиль пользователя</h2>
+            <p><strong>Имя пользователя:</strong> {{ user.username }}</p>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            <div>
+                <h3>Действия</h3>
+                <ul class="action-list">
+                    <li><a href="#">Редактировать профиль</a></li>
+                    <li><a href="{% url 'password_change' %}">Сменить пароль</a></li>
+                </ul>
+            </div>
+        </div>
+    </main>
+    <footer class="container">
+        <small>
+            <a href="{% url 'terms' %}">Условия использования</a> • <a href="{% url 'privacy_policy' %}">Политика конфиденциальности</a>
+        </small>
+    </footer>
+</body>
+</html>

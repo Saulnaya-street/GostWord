@@ -5,65 +5,86 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
     <style>
-        .element {
+         .element {
             margin-bottom: 10px;
         }
 
+    /* Обертка для секции и формы, чтобы кнопки смещались вниз */
+        .form-wrapper {
+            display: flex;
+            flex-direction: column;
+            min-height: calc(100vh - 60px); /* вычитаем высоту nav и footer если они есть */
+        }
+
+    /* Группа кнопок, которые будут в конце формы */
         .button-group {
-            display: block;
             text-align: center;
-            margin-top: 20px;
+            margin-top: auto; /* Смещаем кнопки вниз, независимо от содержимого .element */
+            padding: 20px 0;
         }
 
         .button-group button {
             width: auto;
-            display: inline-block; /* Prevents buttons from stretching to fit the container */
+            display: inline-block; /* Предотвращаем растягивание кнопок на весь контейнер */
+            margin: 0 5px;
         }
+
+         table {
+        border-collapse: collapse;
+        width: 100%;
+        }
+
+        /* Стили для ячеек таблицы */
+        td, th {
+        border: 1px solid #000000; /* Черная граница толщиной в 1px */
+        text-align: left;
+        padding: 8px;
+        }
+
     </style>
     <title>Мульти-элементный интерфейс добавления данных</title>
 </head>
 <body>
     <nav class="container-fluid">
         <ul>
-            <li><strong>Word ГОСТ Редактор</strong></li>
+            <li><strong><a href="{% url 'home' %}" style="color: inherit; text-decoration: none;">Word ГОСТ Редактор</a></strong></li>
         </ul>
         <ul>
-            <li><a href="#">Главная</a></li>
-            <li><a href="#">О приложении</a></li>
-            <li><a href="#">Контакты</a></li>
+            <li><a href="{% url 'home' %}">Главная</a></li>
+            <li><a href="{% url 'about' %}">О приложении</a></li>
+            <li><a href="{% url 'contact' %}">Контакты</a></li>
+            {% if user.is_authenticated %}
+                <li><a href="{% url 'profile' %}">Профиль</a></li>
+                <li><a href="{% url 'confirm_logout' %}">Выйти</a></li>
+            {% else %}
+                <li><a href="{% url 'login' %}">Авторизация</a></li>
+            {% endif %}
         </ul>
     </nav>
     <main class="container">
         <div class="grid">
-            <section>
+             <section>
                 <h2>Добавление множества элементов</h2>
                 <p>Добавляйте различные типы данных, такие как текст, изображения, формулы и таблицы.</p>
-                <form class="grid" id="multiElementForm">
+                <!-- Обратите внимание на action="{% url 'create_word_document' %}" в вашем Django шаблоне -->
+                <form class="grid" id="multiElementForm" method="post" action="{% url 'create_word_document' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
                     <div id="elementsContainer">
-                        <div class="element">
-                            <label for="elementType0">Тип элемента:</label>
-                            <select id="elementType0" name="elementType0" onchange="adjustElementInput(0)">
-                                <option value="text">Текст</option>
-                                <option value="image">Изображение</option>
-                                <option value="formula">Формула</option>
-                                <option value="table">Таблица</option>
-                                <option value="header">Заголовок</option>
-                            </select>
-                            <div id="elementInput0"></div>
+                    <!-- Здесь будут добавляться новые элементы через JavaScript -->
+
+                            <div class="button-group">
+                                <button type="button" onclick="addElement()">Добавить еще элемент</button>
+                                <button type="submit">Скачать документ</button>
+                            </div>
                         </div>
-                    </div>
+                    <input type="hidden" name="elementCount" id="elementCount" value="1">
                 </form>
-                <div class="button-group">
-                    <button type="button" onclick="addElement()">Добавить еще элемент</button>
-                    <button type="button" onclick="submitElements()">Добавить в документ</button>
-                </div>
-                <button type="button" onclick="downloadDocument()" style="display: block; margin: 20px auto 0;">Скачать документ</button>
             </section>
         </div>
     </main>
     <footer class="container">
         <small>
-            <a href="#">Политика конфиденциальности</a> • <a href="#">Условия использования</a>
+            <a href="{% url 'terms' %}">Условия использования</a> • <a href="{% url 'privacy_policy' %}">Политика конфиденциальности</a>
         </small>
     </footer>
     <script>
@@ -78,13 +99,20 @@
                     inputContainer.innerHTML = '<label for="text' + index + '">Текст:</label><textarea id="text' + index + '" name="text' + index + '" rows="3"></textarea>';
                     break;
                 case 'image':
-                    inputContainer.innerHTML = '<label for="image' + index + '">URL изображения:</label><input type="text" id="image' + index + '" name="image' + index + '" placeholder="http://example.com/image.jpg">';
+                    inputContainer.innerHTML = '<label for="image' + index + '">Загрузить изображение:</label><input type="file" id="image' + index + '" name="image' + index + '" accept="image/*">';
                     break;
                 case 'formula':
                     inputContainer.innerHTML = '<label for="formula' + index + '">Формула (в формате LaTeX, например, \\frac{1}{2}):</label><input type="text" id="formula' + index + '" name="formula' + index + '" placeholder="Введите формулу">';
                     break;
                 case 'table':
-                    inputContainer.innerHTML = '<label for="tableRows' + index + '">Количество строк:</label><input type="number" id="tableRows' + index + '" name="tableRows' + index + '" min="1" value="2"><br><label for="tableCols' + index + '">Количество столбцов:</label><input type="number" id="tableCols' + index + '" name="tableCols' + index + '" min="1" value="2"><br><button type="button" onclick="generateTable(' + index + ')">Создать таблицу</button><div id="tableContainer' + index + '"></div>';
+                    inputContainer.innerHTML = `
+                        <label for="tableRows${index}">Количество строк:</label>
+                        <input type="number" id="tableRows${index}" name="tableRows${index}" min="1" value="2">
+                        <label for="tableCols${index}">Количество столбцов:</label>
+                        <input type="number" id="tableCols${index}" name="tableCols${index}" min="1" value="2">
+                        <button type="button" onclick="generateTable(${index})">Создать таблицу</button>
+                        <div id="tableContainer${index}"></div>
+                    `;
                     break;
                 case 'header':
                     inputContainer.innerHTML = '<label for="header' + index + '">Заголовок:</label><input type="text" id="header' + index + '" name="header' + index + '" placeholder="Введите заголовок">';
@@ -96,11 +124,13 @@
             const rows = document.getElementById('tableRows' + index).value;
             const cols = document.getElementById('tableCols' + index).value;
             const tableContainer = document.getElementById('tableContainer' + index);
-            let tableHTML = '<table border="1">';
+            let tableHTML = '<table>';
+
             for (let i = 0; i < rows; i++) {
                 tableHTML += '<tr>';
                 for (let j = 0; j < cols; j++) {
-                    tableHTML += '<td>Ячейка ' + (i + 1) + ',' + (j + 1) + '</td>';
+                    // Здесь добавляем элементы ввода в каждую ячейку
+                    tableHTML += `<td><input type="text" name="cell${index}_${i}_${j}" /></td>`;
                 }
                 tableHTML += '</tr>';
             }
@@ -108,14 +138,43 @@
             tableContainer.innerHTML = tableHTML;
         }
 
+
         function addElement() {
             const container = document.getElementById('elementsContainer');
             const newElement = document.createElement('div');
             newElement.classList.add('element');
-            newElement.innerHTML = '<label for="elementType' + elementCount + '">Тип элемента:</label><select id="elementType' + elementCount + '" name="elementType' + elementCount + '" onchange="adjustElementInput(' + elementCount + ')"><option value="text">Текст</option><option value="image">Изображение</option><option value="formula">Формула</option><option value="table">Таблица</option><option value="header">Заголовок</option></select><div id="elementInput' + elementCount + '"></div>';
-            container.appendChild(newElement);
+            newElement.innerHTML = `
+                <label for="elementType${elementCount}">Тип элемента:</label>
+                <select id="elementType${elementCount}" name="elementType${elementCount}" onchange="adjustElementInput(${elementCount})">
+                    <option value="text">Текст</option>
+                    <option value="image">Изображение</option>
+                    <option value="formula">Формула</option>
+                    <option value="table">Таблица</option>
+                    <option value="header">Заголовок</option>
+                </select>
+                <div id="elementInput${elementCount}"></div>
+            `;
+            container.appendChild(newElement); // Добавляем новый элемент в контейнер
             adjustElementInput(elementCount);
+
+            // Проверяем и перемещаем группу кнопок в конец контейнера, если она уже существует
+            let buttonGroup = document.querySelector('.button-group');
+            if (buttonGroup) {
+                container.appendChild(buttonGroup);
+            } else {
+                // Если группа кнопок не найдена, создаем новую и добавляем в конец контейнера
+                buttonGroup = document.createElement('div');
+                buttonGroup.classList.add('button-group');
+                buttonGroup.innerHTML = `
+                    <button type="button" onclick="addElement()">Добавить еще элемент</button>
+                    <button type="submit">Скачать документ</button>
+                `;
+                container.appendChild(buttonGroup);
+            }
+
+            // Увеличиваем значение скрытого поля, чтобы отслеживать количество элементов
             elementCount++;
+            document.getElementById('elementCount').value = elementCount;
         }
 
         function submitElements() {
@@ -142,10 +201,10 @@
         }
     }
 
-    // Создаем ссылку для скачивания
+    // Создаем ссылку для скачивания посмотреть что здесь не так
     const element = document.createElement('a');
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(allText));
-    element.setAttribute('download', "document.txt");
+    element.setAttribute('download', "document.docx");
 
     // Программно кликаем по ссылке для скачивания
     element.style.display = 'none';

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <title>Авторизация</title>
+</head>
+<body>
+    <nav class="container-fluid">
+        <ul>
+            <li><strong><a href="{% url 'home' %}">Word ГОСТ Редактор</a></strong></li>
+        </ul>
+        <ul>
+            <li><a href="{% url 'home' %}">Главная</a></li>
+            <li><a href="{% url 'about' %}">О приложении</a></li>
+            <li><a href="{% url 'contact' %}">Контакты</a></li>
+            {% if user.is_authenticated %}
+                <li><a href="{% url 'profile' %}">Профиль</a></li>
+                <li><a href="{% url 'confirm_logout' %}">Выйти</a></li>
+            {% else %}
+                <li><a href="{% url 'login' %}">Авторизация</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    <main class="container">
+        <section class="grid">
+            <div class="card">
+                <h2>Регистрация</h2>
+                <form method="post" action="{% url 'register' %}"> <!-- Используем URL-тег Django -->
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="primary">Зарегистрироваться</button>
+                </form>
+            </div>
+        </section>
+    </main>
+    <footer class="container">
+        <small>
+            <a href="{% url 'terms' %}">Условия использования</a> • <a href="{% url 'privacy_policy' %}">Политика конфиденциальности</a>
+        </small>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <title>Контакты - Word ГОСТ Редактор</title>
+</head>
+<body>
+    <nav class="container-fluid">
+        <ul>
+            <li><strong><a href="{% url 'home' %}" style="color: inherit; text-decoration: none;">Word ГОСТ Редактор</a></strong></li>
+        </ul>
+        <ul>
+            <li><a href="{% url 'home' %}">Главная</a></li>
+            <li><a href="{% url 'about' %}">О приложении</a></li>
+            <li><a href="{% url 'contact' %}">Контакты</a></li>
+            {% if user.is_authenticated %}
+                <li><a href="{% url 'profile' %}">Профиль</a></li>
+                <li><a href="{% url 'confirm_logout' %}">Выйти</a></li>
+            {% else %}
+                <li><a href="{% url 'login' %}">Авторизация</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    <main class="container">
+        <div class="grid">
+            <section>
+                <hgroup>
+                    <h2>Свяжитесь с нами</h2>
+                    <h3>Мы всегда рады помочь!</h3>
+                </hgroup>
+                <p>Если у вас есть вопросы, предложения или вы хотите узнать больше о нашем приложении, не стесняйтесь обращаться к нам. Мы стремимся предоставлять качественную поддержку и всегда открыты к обратной связи.</p>
+                <h3>Контактная информация</h3>
+                <p>Электронная почта: support@gosteditor.ru<br>Телефон: +7 (999) 123-45-67</p>
+                <h3>Адрес</h3>
+                <p>Россия, Новосибирск, ул. Калатушкина, д. 1</p>
+                <h3>Социальные сети</h3>
+                <p>Вы также можете найти нас в социальных сетях:<br><a href="#">Vk</a><br><a href="#">Instagram</a></p>
+            </section>
+        </div>
+    </main>
+    <footer class="container">
+        <small>
+            <a href="{% url 'terms' %}">Условия использования</a> • <a href="{% url 'privacy_policy' %}">Политика конфиденциальности</a>
+        </small>
+    </footer>
+</body>
+</html>
